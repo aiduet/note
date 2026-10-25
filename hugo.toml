@@ -1,6 +1,6 @@
 baseURL = "https://note.pp.ua/"
 theme = "hugo-bearblog"
-title = "(｡･ω･｡)ﾉ♡ Tu"
+title = "Duet"
 languageCode = "en"
 enableRobotsTXT = true
 disableKinds = ["taxonomy"]
@@ -11,7 +11,7 @@ ignoreErrors = ["error-disable-taxonomy"]
 
 [params]
   description = "Notes and travel, from Shanghai."
-  title = "Tu"
+  title = "Duet"
   dateFormat = "02 Jan, 2006"
   hideMadeWithLine = true
 
