@@ -1,0 +1,22 @@
+baseURL = "https://note.pp.ua/"
+theme = "hugo-bearblog"
+title = "(｡･ω･｡)ﾉ♡ Tu"
+languageCode = "en"
+enableRobotsTXT = true
+disableKinds = ["taxonomy"]
+ignoreErrors = ["error-disable-taxonomy"]
+
+[permalinks]
+  blog = "/:slug/"
+
+[params]
+  description = "Notes and travel, from Shanghai."
+  title = "Tu"
+  dateFormat = "02 Jan, 2006"
+  hideMadeWithLine = true
+
+[markup]
+  [markup.highlight]
+    style = "friendly"
+    codeFences = true
+    lineNos = false
