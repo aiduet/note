@@ -28,7 +28,3 @@ tags = ["travel"]
 ![](https://img.note.pp.ua/file/blog/travel/jiaxing-2025-05-20/IMG_2607.webp)
 
 ![](https://img.note.pp.ua/file/blog/travel/jiaxing-2025-05-20/IMG_2713.webp)
-
-[#jiaxing](/blog/?q=jiaxing)
-                
-                    [#travel](/blog/?q=travel)

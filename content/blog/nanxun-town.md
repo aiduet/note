@@ -16,9 +16,3 @@ tags = ["travel"]
 ![](https://img.note.pp.ua/file/blog/travel/2025-05-03-17.52.13.webp)
 
 ![](https://img.note.pp.ua/file/blog/travel/2025-05-03-18.12.38.webp)
-
-[#jiangnan](/blog/?q=jiangnan)
-                
-                    [#nanxun](/blog/?q=nanxun)
-                
-                    [#travel](/blog/?q=travel)

@@ -19,7 +19,7 @@ See: https://chromium.googlesource.com/chromium/src.git/+/HEAD/docs/ios/user_age
 
 Safari also showed the pop-up. iOS Safari and macOS Safari UAs differ a bit. This check fixed it:
 
-```
+```javascript
 function isSupportedBrowser() {
   const ua = navigator.userAgent;
   const macSafariRegex = /Version\/(\d+).*Safari/;
@@ -70,15 +70,3 @@ function isSupportedBrowser() {
   return false;
 }
 ```
-
-    
-
-    
-        
-            
-                
-                    [#blog](/blog/?q=blog)
-                
-                    [#css](/blog/?q=css)
-                
-                    [#notes](/blog/?q=notes)

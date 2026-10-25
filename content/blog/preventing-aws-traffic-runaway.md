@@ -7,7 +7,7 @@ tags = ["notes"]
 
 I use a free AWS box as a reverse proxy. To keep the traffic quota, I wrote a small script. If usage goes over a limit, it pings a Telegram bot.
 
-```
+```json
 ### config.json
 # {
 #   "telegram_bot_token": "xxxxx:xxxxxxx",
@@ -73,15 +73,3 @@ while True:
     schedule.run_pending()
     time.sleep(1)
 ```
-
-    
-
-    
-        
-            
-                
-                    [#aws](/blog/?q=aws)
-                
-                    [#cloudflare](/blog/?q=cloudflare)
-                
-                    [#notes](/blog/?q=notes)

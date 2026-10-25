@@ -163,9 +163,3 @@ Easier to tell apart:
 The line I keep:
 
 Architecture is not about making a system look smarter. It is about putting complexity where it belongs.
-
-[#architecture](/blog/?q=architecture)
-                
-                    [#bot](/blog/?q=bot)
-                
-                    [#notes](/blog/?q=notes)

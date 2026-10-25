@@ -20,9 +20,3 @@ tags = ["travel"]
 ![](https://img.note.pp.ua/file/blog/travel/hangzhou-2025-05-01/IMG_2443.webp)
 
 ![](https://img.note.pp.ua/file/blog/travel/hangzhou-2025-05-01/IMG_2374.webp)
-
-[#hangzhou](/blog/?q=hangzhou)
-                
-                    [#jiangnan](/blog/?q=jiangnan)
-                
-                    [#travel](/blog/?q=travel)

@@ -23,7 +23,7 @@ Local → GitHub → Docker Hub → reset the pod → k3s pulls
 
 `.github/workflows/build-and-deploy.yml`:
 
-```
+```yaml
 name: Build and Deploy
 
 on:
@@ -74,7 +74,7 @@ Hugo writes static files into `public/`. nginx can serve that folder as-is.
 
 `Dockerfile`:
 
-```
+```dockerfile
 FROM nginx:alpine
 
 COPY public/ /usr/share/nginx/html/
@@ -86,7 +86,7 @@ EXPOSE 80
 
 I already had cert-manager, so I did not use LoadBalancer. I used nginx-ingress.
 
-```
+```yaml
 apiVersion: v1
 kind: Service
 metadata:
@@ -154,9 +154,3 @@ spec:
 ```
 
 The image on Docker Hub is public. I may buy a larger server later so I can keep a private image.
-
-[#blog](/blog/?q=blog)
-                
-                    [#docker](/blog/?q=docker)
-                
-                    [#notes](/blog/?q=notes)

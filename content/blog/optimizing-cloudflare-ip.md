@@ -13,7 +13,7 @@ Too many people use the CNAME trick. It breaks often.
 
 I skip the SaaS setup. Plenty of guides exist. The DNS part is enough.
 
-```
+```bash
  curl --request GET \
   --url https://api.cloudflare.com/client/v4/zones/your_zoneid/dns_records \
   --header 'Content-Type: application/json' \
@@ -34,7 +34,7 @@ I skip the SaaS setup. Plenty of guides exist. The DNS part is enough.
 }
 ```
 
-```
+```python
 import requests
 import schedule
 import ipaddress
@@ -173,15 +173,3 @@ while True:
     schedule.run_pending()
     time.sleep(1)
 ```
-
-    
-
-    
-        
-            
-                
-                    [#cloudflare](/blog/?q=cloudflare)
-                
-                    [#network](/blog/?q=network)
-                
-                    [#notes](/blog/?q=notes)

@@ -13,7 +13,7 @@ So: a nice name almost never drops for you.
 
 The ones worth trying are odd country TLDs, like p.ng or v.ps. I saw an `.ee` name on expireddomains.net about to drop. I do not know the exact time, so I wrote a watcher.
 
-```
+```python
 import time
 import requests
 from xml.etree import ElementTree
@@ -75,9 +75,3 @@ if __name__ == "__main__":
 ```
 
 Direct WHOIS is slow. The `.ee` registry is the bottleneck.
-
-[#domain](/blog/?q=domain)
-                
-                    [#notes](/blog/?q=notes)
-                
-                    [#whois](/blog/?q=whois)

@@ -11,7 +11,7 @@ Work was in Go, so I wrote this in Go too. Colleagues can change it.
 
 I called it `ecc`. Layout:
 
-```
+```text
 .
 |-- cmd
 |   `-- ecc.go
@@ -40,7 +40,7 @@ The CLI uses [github.com/urfave/cli/v2](https://github.com/urfave/cli/v2).
 
 Main flag: `dir` — the folder of Excel files.
 
-```
+```go
 func main() {
 
 	var err error
@@ -85,7 +85,7 @@ I only used MySQL and MongoDB. Redis for cache was dropped.
 
 ### cfg.go
 
-```
+```go
 type Config struct {
 	Env   string `yaml:"env"`
 	Mongo struct {
@@ -117,7 +117,7 @@ I picked (2). The set is small. The files (crawled data) are often messy.
 
 ### handle()
 
-```
+```go
 var (
 	rWait   = true
 	wWait   = true
@@ -185,7 +185,7 @@ func Handle(dir string) {
 
 ### read()
 
-```
+```go
 func read(fs []os.FileInfo, dir string, data *sync.Map) {
 	for _, file := range fs {
 		fileName := file.Name()
@@ -232,7 +232,7 @@ Excel is read with [github.com/xuri/excelize/v2](https://github.com/xuri/exceliz
 
 ### read_excel()
 
-```
+```go
 func ReadExcel(filePath, fileName string, pb *mpb.Progress) (err error, pre *ExcelPre) {
 	f, err := excelize.OpenFile(filePath)
 	if err != nil {
@@ -307,9 +307,3 @@ The rest is normal DB work. I skip that code.
 A run screenshot is lost.
 
 *Update, Jan 2022: the job got more custom. We moved it to a web app.*
-
-[#excel](/blog/?q=excel)
-                
-                    [#go](/blog/?q=go)
-                
-                    [#notes](/blog/?q=notes)

@@ -20,9 +20,3 @@ tags = ["travel"]
 ![](https://img.note.pp.ua/file/blog/travel/2025-05-09-20.12.30.webp)
 
 ![](https://img.note.pp.ua/file/blog/travel/2025-05-09-20.22.58.webp)
-
-[#garden](/blog/?q=garden)
-                
-                    [#suzhou](/blog/?q=suzhou)
-                
-                    [#travel](/blog/?q=travel)
