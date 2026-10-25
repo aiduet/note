@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta http-equiv="X-Clacks-Overhead" content="GNU Terry Pratchett" />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Refactoring a messy Tieba bot | (｡･ω･｡)ﾉ♡ Tu</title>
+<meta name="title" content="Refactoring a messy Tieba bot" />
+<meta name="description" content="This bot did not get hard because of one big bug.
+It got hard from many small, reasonable choices.
+At first the runtime was a simple loop: fetch new threads and replies, filter, judge, maybe like, maybe reply, then save. That lasted longer than it should. Trouble started when new needs blurred what the loop was doing.
+The question was no longer “does it run?” It was “can we still say why it did, or did not, do something?”" />
+<meta name="keywords" content="notes," />
+
+
+<meta property="og:url" content="https://note.pp.ua/refactoring-a-messy-tieba-bot-into-an-evolvable-architecture/">
+  <meta property="og:site_name" content="(｡･ω･｡)ﾉ♡ Tu">
+  <meta property="og:title" content="Refactoring a messy Tieba bot">
+  <meta property="og:description" content="This bot did not get hard because of one big bug.
+It got hard from many small, reasonable choices.
+At first the runtime was a simple loop: fetch new threads and replies, filter, judge, maybe like, maybe reply, then save. That lasted longer than it should. Trouble started when new needs blurred what the loop was doing.
+The question was no longer “does it run?” It was “can we still say why it did, or did not, do something?”">
+  <meta property="og:locale" content="en">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="blog">
+    <meta property="article:published_time" content="2026-03-18T00:00:00+00:00">
+    <meta property="article:modified_time" content="2026-03-18T00:00:00+00:00">
+    <meta property="article:tag" content="Notes">
+
+
+
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Refactoring a messy Tieba bot">
+  <meta name="twitter:description" content="This bot did not get hard because of one big bug.
+It got hard from many small, reasonable choices.
+At first the runtime was a simple loop: fetch new threads and replies, filter, judge, maybe like, maybe reply, then save. That lasted longer than it should. Trouble started when new needs blurred what the loop was doing.
+The question was no longer “does it run?” It was “can we still say why it did, or did not, do something?”">
+
+
+
+
+  <meta itemprop="name" content="Refactoring a messy Tieba bot">
+  <meta itemprop="description" content="This bot did not get hard because of one big bug.
+It got hard from many small, reasonable choices.
+At first the runtime was a simple loop: fetch new threads and replies, filter, judge, maybe like, maybe reply, then save. That lasted longer than it should. Trouble started when new needs blurred what the loop was doing.
+The question was no longer “does it run?” It was “can we still say why it did, or did not, do something?”">
+  <meta itemprop="datePublished" content="2026-03-18T00:00:00+00:00">
+  <meta itemprop="dateModified" content="2026-03-18T00:00:00+00:00">
+  <meta itemprop="wordCount" content="805">
+  <meta itemprop="keywords" content="Notes">
+<meta name="referrer" content="no-referrer-when-downgrade" />
+
+  <style>
+  :root {
+    --width: 720px;
+    --font-main: Verdana, sans-serif;
+    --font-secondary: Verdana, sans-serif;
+    --font-scale: 1em;
+    --background-color: #fff;
+    --heading-color: #222;
+    --text-color: #444;
+    --link-color: #3273dc;
+    --visited-color: #8b6fcb;
+    --blockquote-color: #222;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --background-color: #01242e;
+      --heading-color: #eee;
+      --text-color: #ddd;
+      --link-color: #8cc2dd;
+      --visited-color: #8b6fcb;
+      --blockquote-color: #ccc;
+    }
+  }
+
+  body {
+    font-family: var(--font-secondary);
+    font-size: var(--font-scale);
+    margin: auto;
+    padding: 20px;
+    max-width: var(--width);
+    text-align: left;
+    background-color: var(--background-color);
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    line-height: 1.5;
+    color: var(--text-color);
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-main);
+    color: var(--heading-color);
+  }
+
+  a {
+    color: var(--link-color);
+    cursor: pointer;
+    text-decoration: none;
+  }
+
+  a:hover {
+    text-decoration: underline;
+  }
+
+  nav a {
+    margin-right: 8px;
+  }
+
+  strong,
+  b {
+    color: var(--heading-color);
+  }
+
+  button {
+    margin: 0;
+    cursor: pointer;
+  }
+
+  time {
+    font-family: monospace;
+    font-style: normal;
+    font-size: 15px;
+  }
+
+  main {
+    line-height: 1.6;
+  }
+
+  table {
+    width: 100%;
+  }
+
+  hr {
+    border: 0;
+    border-top: 1px dashed;
+  }
+
+  img {
+    max-width: 100%;
+  }
+
+  code {
+    font-family: monospace;
+    padding: 2px;
+    border-radius: 3px;
+  }
+
+  blockquote {
+    border-left: 1px solid #999;
+    color: var(--blockquote-color);
+    padding-left: 20px;
+    font-style: italic;
+  }
+
+  footer {
+    padding: 25px 0;
+    text-align: center;
+  }
+
+  .title:hover {
+    text-decoration: none;
+  }
+
+  .title h1 {
+    font-size: 1.5em;
+  }
+
+  .inline {
+    width: auto !important;
+  }
+
+  .highlight,
+  .code {
+    border-radius: 3px;
+    margin-block-start: 1em;
+    margin-block-end: 1em;
+    overflow-x: auto;
+  }
+
+  .highlight pre,
+  .code pre {
+    min-width: 100%;
+    width: max-content;
+  }
+
+   
+  ul.blog-posts {
+    list-style-type: none;
+    padding: unset;
+  }
+
+  ul.blog-posts li {
+    display: flex;
+  }
+
+  ul.blog-posts li span {
+    flex: 0 0 130px;
+  }
+
+  ul.blog-posts li a:visited {
+    color: var(--visited-color);
+  }
+
+</style>
+
+</head>
+
+<body>
+  <header><a href="/" class="title">
+  <h2>(｡･ω･｡)ﾉ♡ Tu</h2>
+</a>
+<nav>
+<a href="/">Home</a>
+
+<a href="/blog/">Blog</a>
+
+<a href="/contact/">contact me</a>
+
+</nav>
+</header>
+  <main>
+
+<h1>Refactoring a messy Tieba bot</h1>
+<p>
+  <i>
+    <time datetime='2026-03-18'>
+      18 Mar, 2026
+    </time>
+  </i>
+</p>
+
+<content>
+  <p>This bot did not get hard because of one big bug.</p>
+<p>It got hard from many small, reasonable choices.</p>
+<p>At first the runtime was a simple loop: fetch new threads and replies, filter, judge, maybe like, maybe reply, then save. That lasted longer than it should. Trouble started when new needs blurred what the loop was doing.</p>
+<p>The question was no longer “does it run?” It was “can we still say why it did, or did not, do something?”</p>
+<p><img src="https://img.note.pp.ua/file/blog/articles/tieba-architecture/old-single-pass-runtime.svg" alt="Diagram of the old single-pass Tieba bot runtime, where fetching, judging, acting, notifying, and persistence all lived in one loop."></p>
+<h2 id="the-code-still-runs-the-meaning-is-already-off">The code still runs. The meaning is already off.</h2>
+<p>The first pressure was meaning, not scale.</p>
+<p>Action logic started simple: do not like twice, do not reply twice, record what you did. Later the records were not yes/no. They had a life: planned, done, failed, skipped, dry-run.</p>
+<p>One “actions” table could no longer answer:</p>
+<ul>
+<li>already done, or only picked?</li>
+<li>if it failed, can we retry?</li>
+<li>does “skipped” count as done?</li>
+<li>is “planned” current state, or history?</li>
+</ul>
+<p>A system can keep running after its meaning goes muddy. After that, safe change gets harder every week.</p>
+<p><img src="https://img.note.pp.ua/file/blog/articles/tieba-architecture/action-state-vs-events.svg" alt="Diagram showing the difference between a single overloaded actions table and a clearer split between current state and event history."></p>
+<p>The fix was not a big framework. It was a split:</p>
+<ul>
+<li><code>action_state</code> for what is true now</li>
+<li><code>action_events</code> for what happened</li>
+</ul>
+<p>Small change. Easier to read. Clear that this is not “just a status field”.</p>
+<h2 id="think-like-a-state-machine-you-do-not-need-an-fsm-library">Think like a state machine. You do not need an FSM library.</h2>
+<p>We needed named moves, not better flags.</p>
+<p>Once actions meant <code>planned</code>, <code>leased</code>, <code>done</code>, <code>failed</code>, and cooldown, the runtime was already a state machine, even if the code did not say so.</p>
+<p>A yes/no model cannot cover:</p>
+<ul>
+<li>short downtime vs real failure</li>
+<li>retry vs dead</li>
+<li>current truth vs history</li>
+<li>who holds the lease vs finished work</li>
+</ul>
+<p><img src="https://img.note.pp.ua/file/blog/articles/tieba-architecture/action-lifecycle-fsm.svg" alt="Diagram of the action lifecycle as an FSM-style state transition model, including planned, leased, done, failed, cooldown-rescheduled, and dead."></p>
+<p>We still did <strong>not</strong> need a heavy FSM library. Named states beat a pile of ifs.</p>
+<p>Then a second problem showed up: too much lived in one place.</p>
+<h2 id="hidden-coupling">Hidden coupling</h2>
+<p>One round did four jobs:</p>
+<ol>
+<li>find new content</li>
+<li>judge what to do</li>
+<li>run side effects</li>
+<li>notify and save</li>
+</ol>
+<p>That is fine at first. It breaks when those steps fail for different reasons. Fetch can fail. AI judge can fail. Action can fail on cooldown or the network.</p>
+<p>Those are different failure types. They should not share one loop forever.</p>
+<p>Cooldown made this obvious. When cooldown made discovery feel slow, action time was leaking into find time. That is a design smell.</p>
+<h2 id="do-not-rewrite-everything-first">Do not rewrite everything first</h2>
+<p>When upstream is unstable, a full rewrite is tempting. It was the wrong first move.</p>
+<p>Better:</p>
+<ul>
+<li>cut the transport edge first</li>
+<li>move the read path earlier</li>
+<li>keep action on the old path for a while</li>
+<li>keep a working baseline while the new edge proves itself</li>
+</ul>
+<p><img src="https://img.note.pp.ua/file/blog/articles/tieba-architecture/mixed-boundary-transition.svg" alt="Diagram of the mixed-boundary transition, where the read path moved earlier while action and interaction paths remained temporarily on the old route."></p>
+<p>Not flashy. It ages well. One real edge, without killing a running system.</p>
+<p>Then the product question got clearer too.</p>
+<h2 id="queue-good-targets-do-not-rank-the-whole-world">Queue good targets. Do not rank the whole world.</h2>
+<p>One scan could find more than one good target. The “smart” idea: score all of them, always pick the best. That turns the product into a ranker.</p>
+<p>That was not the point.</p>
+<p>Better: if more than one target deserves a like or reply, put them in a queue and consume at a sane pace.</p>
+<p>Shape:</p>
+<ul>
+<li>ingest / discovery</li>
+<li><code>judge_queue</code></li>
+<li>judge consumer</li>
+<li><code>action_queue</code></li>
+<li>action consumer</li>
+<li>state and events</li>
+</ul>
+<p><img src="https://img.note.pp.ua/file/blog/articles/tieba-architecture/queue-pipeline-and-reliability-boundaries.svg" alt="Diagram of the target queue pipeline, including judge and action queues, consumers, and the split between transaction-first local handoff and idempotency-first external side effects."></p>
+<p>SQLite was enough. No Kafka, Redis, or fake broker. We needed a durable local queue: pending, leased, done, dead-letter, retry, cooldown, crash recovery.</p>
+<p>A solid local task table did the job.</p>
+<p>Queues were not enough. Each edge still needed a reliability rule.</p>
+<h2 id="transactions-inside-idempotency-outside">Transactions inside. Idempotency outside.</h2>
+<p>Transactions and idempotency are not rivals. They solve different things.</p>
+<ul>
+<li>Local table handoff: <strong>transaction first</strong></li>
+<li>Outside side effects: <strong>idempotency first</strong></li>
+</ul>
+<p>Examples:</p>
+<ul>
+<li><code>judge_queue → action_queue</code> is one local atomic step</li>
+<li>a real Tieba like/comment must stay safe if the process dies and retries</li>
+</ul>
+<p>Local consistency and “safe to run twice” are not the same class of failure. A reliable system usually needs both.</p>
+<p>Then the last question was how to add the boxes without breaking production.</p>
+<h2 id="the-target-design-only-works-if-the-move-is-safe">The target design only works if the move is safe</h2>
+<p>The end shape mattered. The path mattered as much.</p>
+<p>A practical rollout:</p>
+<ul>
+<li><strong>Phase 0:</strong> logs, runtime state, service behavior</li>
+<li><strong>Phase 1:</strong> add <code>judge_queue</code>, keep the old path</li>
+<li><strong>Phase 2:</strong> add <code>action_queue</code>, move side effects off direct judgement</li>
+<li><strong>Phase 3:</strong> switch defaults only after watching real runs</li>
+</ul>
+<p><img src="https://img.note.pp.ua/file/blog/articles/tieba-architecture/phased-migration.svg" alt="Diagram of the phased migration path, showing why architecture changes needed a rollback-safe sequence instead of a big-bang rewrite."></p>
+<p>That kept the work honest. We did not “upgrade everything”. We moved complexity only when something real pushed.</p>
+<h2 id="what-actually-changed">What actually changed</h2>
+<p>The win was not “more advanced”.</p>
+<p>The win was: we could explain it again.</p>
+<p>Easier to tell apart:</p>
+<ul>
+<li>what the runtime does now vs what we wish it did</li>
+<li>current state vs event history</li>
+<li>discovery time vs action time</li>
+<li>local transactions vs outside idempotency</li>
+<li>a staged move vs a big-bang rewrite</li>
+</ul>
+<p>The line I keep:</p>
+<p>Architecture is not about making a system look smarter. It is about putting complexity where it belongs.</p>
+<p><a href="/blog/?q=architecture">#architecture</a></p>
+<pre><code>                [#bot](/blog/?q=bot)
+            
+                [#notes](/blog/?q=notes)
+</code></pre>
+
+</content>
+
+<p>
+  
+  <a href="https://note.pp.ua/tags/notes/">#Notes</a>
+  
+</p>
+
+  </main>
+  <footer>
+</footer>
+
+  
+</body>
+
+</html>

@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta http-equiv="X-Clacks-Overhead" content="GNU Terry Pratchett" />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>A new way to deploy the blog | (｡･ω･｡)ﾉ♡ Tu</title>
+<meta name="title" content="A new way to deploy the blog" />
+<meta name="description" content="I moved my code repo in some free time.
+I used to keep private code on Coding, for three reasons:
+
+I knew it from work.
+Push and pull in China was fast.
+I had private image repos and a few hundred free minutes for deploy.
+
+Then it became paid, and deploy to servers abroad was slow. I tried my own nodes. They were still slow, likely because those servers were weak." />
+<meta name="keywords" content="notes," />
+
+
+<meta property="og:url" content="https://note.pp.ua/a-new-way-to-deploy-blog/">
+  <meta property="og:site_name" content="(｡･ω･｡)ﾉ♡ Tu">
+  <meta property="og:title" content="A new way to deploy the blog">
+  <meta property="og:description" content="I moved my code repo in some free time.
+I used to keep private code on Coding, for three reasons:
+I knew it from work. Push and pull in China was fast. I had private image repos and a few hundred free minutes for deploy. Then it became paid, and deploy to servers abroad was slow. I tried my own nodes. They were still slow, likely because those servers were weak.">
+  <meta property="og:locale" content="en">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="blog">
+    <meta property="article:published_time" content="2023-02-12T00:00:00+00:00">
+    <meta property="article:modified_time" content="2023-02-12T00:00:00+00:00">
+    <meta property="article:tag" content="Notes">
+
+
+
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="A new way to deploy the blog">
+  <meta name="twitter:description" content="I moved my code repo in some free time.
+I used to keep private code on Coding, for three reasons:
+I knew it from work. Push and pull in China was fast. I had private image repos and a few hundred free minutes for deploy. Then it became paid, and deploy to servers abroad was slow. I tried my own nodes. They were still slow, likely because those servers were weak.">
+
+
+
+
+  <meta itemprop="name" content="A new way to deploy the blog">
+  <meta itemprop="description" content="I moved my code repo in some free time.
+I used to keep private code on Coding, for three reasons:
+I knew it from work. Push and pull in China was fast. I had private image repos and a few hundred free minutes for deploy. Then it became paid, and deploy to servers abroad was slow. I tried my own nodes. They were still slow, likely because those servers were weak.">
+  <meta itemprop="datePublished" content="2023-02-12T00:00:00+00:00">
+  <meta itemprop="dateModified" content="2023-02-12T00:00:00+00:00">
+  <meta itemprop="wordCount" content="368">
+  <meta itemprop="keywords" content="Notes">
+<meta name="referrer" content="no-referrer-when-downgrade" />
+
+  <style>
+  :root {
+    --width: 720px;
+    --font-main: Verdana, sans-serif;
+    --font-secondary: Verdana, sans-serif;
+    --font-scale: 1em;
+    --background-color: #fff;
+    --heading-color: #222;
+    --text-color: #444;
+    --link-color: #3273dc;
+    --visited-color: #8b6fcb;
+    --blockquote-color: #222;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --background-color: #01242e;
+      --heading-color: #eee;
+      --text-color: #ddd;
+      --link-color: #8cc2dd;
+      --visited-color: #8b6fcb;
+      --blockquote-color: #ccc;
+    }
+  }
+
+  body {
+    font-family: var(--font-secondary);
+    font-size: var(--font-scale);
+    margin: auto;
+    padding: 20px;
+    max-width: var(--width);
+    text-align: left;
+    background-color: var(--background-color);
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    line-height: 1.5;
+    color: var(--text-color);
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-main);
+    color: var(--heading-color);
+  }
+
+  a {
+    color: var(--link-color);
+    cursor: pointer;
+    text-decoration: none;
+  }
+
+  a:hover {
+    text-decoration: underline;
+  }
+
+  nav a {
+    margin-right: 8px;
+  }
+
+  strong,
+  b {
+    color: var(--heading-color);
+  }
+
+  button {
+    margin: 0;
+    cursor: pointer;
+  }
+
+  time {
+    font-family: monospace;
+    font-style: normal;
+    font-size: 15px;
+  }
+
+  main {
+    line-height: 1.6;
+  }
+
+  table {
+    width: 100%;
+  }
+
+  hr {
+    border: 0;
+    border-top: 1px dashed;
+  }
+
+  img {
+    max-width: 100%;
+  }
+
+  code {
+    font-family: monospace;
+    padding: 2px;
+    border-radius: 3px;
+  }
+
+  blockquote {
+    border-left: 1px solid #999;
+    color: var(--blockquote-color);
+    padding-left: 20px;
+    font-style: italic;
+  }
+
+  footer {
+    padding: 25px 0;
+    text-align: center;
+  }
+
+  .title:hover {
+    text-decoration: none;
+  }
+
+  .title h1 {
+    font-size: 1.5em;
+  }
+
+  .inline {
+    width: auto !important;
+  }
+
+  .highlight,
+  .code {
+    border-radius: 3px;
+    margin-block-start: 1em;
+    margin-block-end: 1em;
+    overflow-x: auto;
+  }
+
+  .highlight pre,
+  .code pre {
+    min-width: 100%;
+    width: max-content;
+  }
+
+   
+  ul.blog-posts {
+    list-style-type: none;
+    padding: unset;
+  }
+
+  ul.blog-posts li {
+    display: flex;
+  }
+
+  ul.blog-posts li span {
+    flex: 0 0 130px;
+  }
+
+  ul.blog-posts li a:visited {
+    color: var(--visited-color);
+  }
+
+</style>
+
+</head>
+
+<body>
+  <header><a href="/" class="title">
+  <h2>(｡･ω･｡)ﾉ♡ Tu</h2>
+</a>
+<nav>
+<a href="/">Home</a>
+
+<a href="/blog/">Blog</a>
+
+<a href="/contact/">contact me</a>
+
+</nav>
+</header>
+  <main>
+
+<h1>A new way to deploy the blog</h1>
+<p>
+  <i>
+    <time datetime='2023-02-12'>
+      12 Feb, 2023
+    </time>
+  </i>
+</p>
+
+<content>
+  <p>I moved my code repo in some free time.</p>
+<p>I used to keep private code on Coding, for three reasons:</p>
+<ol>
+<li>I knew it from work.</li>
+<li>Push and pull in China was fast.</li>
+<li>I had private image repos and a few hundred free minutes for deploy.</li>
+</ol>
+<p>Then it became paid, and deploy to servers abroad was slow. I tried my own nodes. They were still slow, likely because those servers were weak.</p>
+<p>Now I run the servers with k3s. Image deploy is simpler:</p>
+<p>Local → GitHub → Docker Hub → reset the pod → k3s pulls</p>
+<h2 id="build-and-push-the-image">Build and push the image</h2>
+<p><code>.github/workflows/build-and-deploy.yml</code>:</p>
+<pre tabindex="0"><code>name: Build and Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Hugo
+        uses: peaceiris/actions-hugo@v2
+        with:
+          hugo-version: &#39;0.110.0&#39;
+
+      - name: Remove old public folder
+        run: rm -rf public
+
+      - name: Build website
+        run: hugo --minify
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }} # create a on docker
+
+      - name: Build image and push
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: avacooper/blog:latest # your img path
+
+      - name: Cleanup
+        run: |
+          docker system prune -af --volumes
+          rm -rf ./public
+</code></pre><p>Hugo writes static files into <code>public/</code>. nginx can serve that folder as-is.</p>
+<p><code>Dockerfile</code>:</p>
+<pre tabindex="0"><code>FROM nginx:alpine
+
+COPY public/ /usr/share/nginx/html/
+
+EXPOSE 80
+</code></pre><h2 id="k3s">k3s</h2>
+<p>I already had cert-manager, so I did not use LoadBalancer. I used nginx-ingress.</p>
+<pre tabindex="0"><code>apiVersion: v1
+kind: Service
+metadata:
+  name: org-domain-blog
+  labels:
+    app: blog
+spec:
+  ports:
+    - port: 80
+      name: blog
+      targetPort: 80
+  selector:
+    app: blog
+  type: ClusterIP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: blog
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: blog
+  template:
+    metadata:
+      labels:
+        app: blog
+    spec:
+      containers:
+        - name: blog
+          image: avacooper/blog:latest
+          ports:
+            - containerPort: 80
+          imagePullPolicy: Always
+    #   nodeSelector:
+    #     nn: sp
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: org-domain-blog-ingress
+  annotations:
+    cert-manager.io/cluster-issuer: &#34;letsencrypt-prod&#34;
+    nginx.ingress.kubernetes.io/proxy-send-timeout: &#34;3600&#34;
+    nginx.ingress.kubernetes.io/proxy-read-timeout: &#34;3600&#34;
+spec:
+  ingressClassName: nginx
+  tls:
+  - hosts: 
+    - &#34;*.domain.org&#34;
+    - &#34;blog.domain.org&#34;
+    secretName: tls
+  rules:
+  - host: blog.domain.org
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service: 
+            name: org-domain-blog
+            port:
+              number: 80
+</code></pre><p>The image on Docker Hub is public. I may buy a larger server later so I can keep a private image.</p>
+<p><a href="/blog/?q=blog">#blog</a></p>
+<pre><code>                [#docker](/blog/?q=docker)
+            
+                [#notes](/blog/?q=notes)
+</code></pre>
+
+</content>
+
+<p>
+  
+  <a href="https://note.pp.ua/tags/notes/">#Notes</a>
+  
+</p>
+
+  </main>
+  <footer>
+</footer>
+
+  
+</body>
+
+</html>

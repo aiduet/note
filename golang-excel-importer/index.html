@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta http-equiv="X-Clacks-Overhead" content="GNU Terry Pratchett" />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>A small Go tool to import Excel | (｡･ω･｡)ﾉ♡ Tu</title>
+<meta name="title" content="A small Go tool to import Excel" />
+<meta name="description" content="Need: import Excel files into MongoDB and MySQL in batches.
+Work was in Go, so I wrote this in Go too. Colleagues can change it.
+I called it ecc. Layout:
+.
+|-- cmd
+|   `-- ecc.go
+|-- configs
+|   |-- cfg.go
+|   `-- cfg.yaml
+|-- data
+|-- internal
+|   `-- importing
+|-- pkg
+|   |-- files
+|   |-- mongo
+|   `-- mysql
+|-- tools
+|    `-- print.go
+|-- go.mod
+|-- go.sum
+|-- LICENSE
+|-- README.en.md
+`-- README.md
+ecc.go
+The CLI uses github.com/urfave/cli/v2." />
+<meta name="keywords" content="notes," />
+
+
+<meta property="og:url" content="https://note.pp.ua/golang-excel-importer/">
+  <meta property="og:site_name" content="(｡･ω･｡)ﾉ♡ Tu">
+  <meta property="og:title" content="A small Go tool to import Excel">
+  <meta property="og:description" content="Need: import Excel files into MongoDB and MySQL in batches.
+Work was in Go, so I wrote this in Go too. Colleagues can change it.
+I called it ecc. Layout:
+. |-- cmd | `-- ecc.go |-- configs | |-- cfg.go | `-- cfg.yaml |-- data |-- internal | `-- importing |-- pkg | |-- files | |-- mongo | `-- mysql |-- tools | `-- print.go |-- go.mod |-- go.sum |-- LICENSE |-- README.en.md `-- README.md ecc.go The CLI uses github.com/urfave/cli/v2.">
+  <meta property="og:locale" content="en">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="blog">
+    <meta property="article:published_time" content="2021-05-12T00:00:00+00:00">
+    <meta property="article:modified_time" content="2021-05-12T00:00:00+00:00">
+    <meta property="article:tag" content="Notes">
+
+
+
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="A small Go tool to import Excel">
+  <meta name="twitter:description" content="Need: import Excel files into MongoDB and MySQL in batches.
+Work was in Go, so I wrote this in Go too. Colleagues can change it.
+I called it ecc. Layout:
+. |-- cmd | `-- ecc.go |-- configs | |-- cfg.go | `-- cfg.yaml |-- data |-- internal | `-- importing |-- pkg | |-- files | |-- mongo | `-- mysql |-- tools | `-- print.go |-- go.mod |-- go.sum |-- LICENSE |-- README.en.md `-- README.md ecc.go The CLI uses github.com/urfave/cli/v2.">
+
+
+
+
+  <meta itemprop="name" content="A small Go tool to import Excel">
+  <meta itemprop="description" content="Need: import Excel files into MongoDB and MySQL in batches.
+Work was in Go, so I wrote this in Go too. Colleagues can change it.
+I called it ecc. Layout:
+. |-- cmd | `-- ecc.go |-- configs | |-- cfg.go | `-- cfg.yaml |-- data |-- internal | `-- importing |-- pkg | |-- files | |-- mongo | `-- mysql |-- tools | `-- print.go |-- go.mod |-- go.sum |-- LICENSE |-- README.en.md `-- README.md ecc.go The CLI uses github.com/urfave/cli/v2.">
+  <meta itemprop="datePublished" content="2021-05-12T00:00:00+00:00">
+  <meta itemprop="dateModified" content="2021-05-12T00:00:00+00:00">
+  <meta itemprop="wordCount" content="875">
+  <meta itemprop="keywords" content="Notes">
+<meta name="referrer" content="no-referrer-when-downgrade" />
+
+  <style>
+  :root {
+    --width: 720px;
+    --font-main: Verdana, sans-serif;
+    --font-secondary: Verdana, sans-serif;
+    --font-scale: 1em;
+    --background-color: #fff;
+    --heading-color: #222;
+    --text-color: #444;
+    --link-color: #3273dc;
+    --visited-color: #8b6fcb;
+    --blockquote-color: #222;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --background-color: #01242e;
+      --heading-color: #eee;
+      --text-color: #ddd;
+      --link-color: #8cc2dd;
+      --visited-color: #8b6fcb;
+      --blockquote-color: #ccc;
+    }
+  }
+
+  body {
+    font-family: var(--font-secondary);
+    font-size: var(--font-scale);
+    margin: auto;
+    padding: 20px;
+    max-width: var(--width);
+    text-align: left;
+    background-color: var(--background-color);
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    line-height: 1.5;
+    color: var(--text-color);
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-main);
+    color: var(--heading-color);
+  }
+
+  a {
+    color: var(--link-color);
+    cursor: pointer;
+    text-decoration: none;
+  }
+
+  a:hover {
+    text-decoration: underline;
+  }
+
+  nav a {
+    margin-right: 8px;
+  }
+
+  strong,
+  b {
+    color: var(--heading-color);
+  }
+
+  button {
+    margin: 0;
+    cursor: pointer;
+  }
+
+  time {
+    font-family: monospace;
+    font-style: normal;
+    font-size: 15px;
+  }
+
+  main {
+    line-height: 1.6;
+  }
+
+  table {
+    width: 100%;
+  }
+
+  hr {
+    border: 0;
+    border-top: 1px dashed;
+  }
+
+  img {
+    max-width: 100%;
+  }
+
+  code {
+    font-family: monospace;
+    padding: 2px;
+    border-radius: 3px;
+  }
+
+  blockquote {
+    border-left: 1px solid #999;
+    color: var(--blockquote-color);
+    padding-left: 20px;
+    font-style: italic;
+  }
+
+  footer {
+    padding: 25px 0;
+    text-align: center;
+  }
+
+  .title:hover {
+    text-decoration: none;
+  }
+
+  .title h1 {
+    font-size: 1.5em;
+  }
+
+  .inline {
+    width: auto !important;
+  }
+
+  .highlight,
+  .code {
+    border-radius: 3px;
+    margin-block-start: 1em;
+    margin-block-end: 1em;
+    overflow-x: auto;
+  }
+
+  .highlight pre,
+  .code pre {
+    min-width: 100%;
+    width: max-content;
+  }
+
+   
+  ul.blog-posts {
+    list-style-type: none;
+    padding: unset;
+  }
+
+  ul.blog-posts li {
+    display: flex;
+  }
+
+  ul.blog-posts li span {
+    flex: 0 0 130px;
+  }
+
+  ul.blog-posts li a:visited {
+    color: var(--visited-color);
+  }
+
+</style>
+
+</head>
+
+<body>
+  <header><a href="/" class="title">
+  <h2>(｡･ω･｡)ﾉ♡ Tu</h2>
+</a>
+<nav>
+<a href="/">Home</a>
+
+<a href="/blog/">Blog</a>
+
+<a href="/contact/">contact me</a>
+
+</nav>
+</header>
+  <main>
+
+<h1>A small Go tool to import Excel</h1>
+<p>
+  <i>
+    <time datetime='2021-05-12'>
+      12 May, 2021
+    </time>
+  </i>
+</p>
+
+<content>
+  <p>Need: import Excel files into MongoDB and MySQL in batches.</p>
+<p>Work was in Go, so I wrote this in Go too. Colleagues can change it.</p>
+<p>I called it <code>ecc</code>. Layout:</p>
+<pre tabindex="0"><code>.
+|-- cmd
+|   `-- ecc.go
+|-- configs
+|   |-- cfg.go
+|   `-- cfg.yaml
+|-- data
+|-- internal
+|   `-- importing
+|-- pkg
+|   |-- files
+|   |-- mongo
+|   `-- mysql
+|-- tools
+|    `-- print.go
+|-- go.mod
+|-- go.sum
+|-- LICENSE
+|-- README.en.md
+`-- README.md
+</code></pre><h3 id="eccgo">ecc.go</h3>
+<p>The CLI uses <a href="https://github.com/urfave/cli/v2">github.com/urfave/cli/v2</a>.</p>
+<p>Main flag: <code>dir</code> — the folder of Excel files.</p>
+<pre tabindex="0"><code>func main() {
+
+	var err error
+	var model string
+	dir := DirPath
+	app := &amp;cli.App{
+		Name:  &#34;Ecc&#34;,
+		Usage: &#34;Ecc is a tools for batch processing of excel data&#34;,
+		Flags: []cli.Flag{
+			&amp;cli.StringFlag{
+				Name:        &#34;model&#34;,
+				Aliases:     []string{&#34;m&#34;},
+				Usage:       &#34;The model of searching&#34;,
+				Value:       &#34;model&#34;,
+				Destination: &amp;model,
+			},
+			&amp;cli.StringFlag{
+				Name:        &#34;dir&#34;,
+				Aliases:     []string{&#34;d&#34;},
+				Usage:       &#34;Folder location of data files&#34;,
+				Destination: &amp;dir,
+				Value:       DirPath,
+			},
+		},
+		Action: func(c *cli.Context) error {
+			importing.Load(&#34;../configs/cfg.yaml&#34;)
+			importing.Handle(dir)
+			return nil
+		},
+	}
+
+	err = app.Run(os.Args)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+</code></pre><p>Flags set options. Action runs the job. It loads the DB config first.</p>
+<p>I only used MySQL and MongoDB. Redis for cache was dropped.</p>
+<h3 id="cfggo">cfg.go</h3>
+<pre tabindex="0"><code>type Config struct {
+	Env   string `yaml:&#34;env&#34;`
+	Mongo struct {
+		DNS        string `yaml:&#34;dns&#34;`
+		Db         string `yaml:&#34;db&#34;`
+		Collection string `yaml:&#34;collection&#34;`
+	} `yaml:&#34;mongo&#34;`
+	Mysql struct {
+		Alias string `yaml:&#34;alias&#34;`
+		Dns   string `yaml:&#34;dns&#34;`
+	} `yaml:&#34;mysql&#34;`
+}
+</code></pre><p>Config is read with <a href="https://github.com/spf13/viper">github.com/spf13/viper</a>.</p>
+<p>The core is <code>importing.Handle()</code>.</p>
+<p>A common path: one goroutine per file to read, then write in another — or write each row as you read.</p>
+<p>Here every run must check <strong>all</strong> Excel files in the folder first. If one file is bad, stop.</p>
+<p>Two choices:</p>
+<ol>
+<li>Read and write at the same time. On error, roll back and kill all goroutines.</li>
+<li>Read everything into a map. If it is clean, write to the DB.</li>
+</ol>
+<p>I picked (2). The set is small. The files (crawled data) are often messy.</p>
+<h3 id="handle">handle()</h3>
+<pre tabindex="0"><code>var (
+	rWait   = true
+	wWait   = true
+	rDone   = make(chan struct{})
+	rCrash  = make(chan struct{})
+	wDone   = make(chan struct{})
+	wCrash  = make(chan struct{})
+	once    = &amp;sync.Once{}
+	wg      = &amp;sync.WaitGroup{}
+        // command-line progress bar
+	pb      = mpb.New(mpb.WithWaitGroup(wg), mpb.WithWidth(ProcessBarWidth)) 
+)
+
+...
+
+func Handle(dir string) {
+	var err error
+	var f []os.FileInfo
+	var data = &amp;sync.Map{}
+
+	if f, err = files.ReadDir(dir); err != nil {
+		abort(&#34;-&gt; Failure: &#34; + err.Error())
+		return
+	}
+
+	read(f, dir, data)
+	for rWait {
+		select {
+		case &lt;-rCrash:
+			abort(&#34;-&gt; Failure&#34;)
+			return
+		case &lt;-rDone:
+			rWait = false
+		}
+	}
+
+	write2mongo(data)
+	for wWait {
+		select {
+		case &lt;-wCrash:
+			abort(&#34;-&gt; Failure&#34;)
+			return
+		case &lt;-wDone:
+			wWait = false
+		}
+	}
+
+	pb.Wait()
+
+	tools.Yellow(&#34;-&gt; Whether to sync data to mysql? (y/n)&#34;)
+	if !tools.Scan(&#34;aborted&#34;) {
+		return
+	} else {
+		tools.Yellow(&#34;-&gt; Syncing data to mysql...&#34;)
+		if err = write2mysql(); err != nil {
+			tools.Red(&#34;-&gt; Failure：&#34; + err.Error())
+		} else {
+			tools.Green(&#34;-&gt; Success.&#34;)
+		}
+	}
+}
+</code></pre><p><code>rCrash</code> means a check failed. Close it to stop all readers. <code>rDone</code> means all files were read. Write uses the same idea.</p>
+<h3 id="read">read()</h3>
+<pre tabindex="0"><code>func read(fs []os.FileInfo, dir string, data *sync.Map) {
+	for _, file := range fs {
+		fileName := file.Name()
+		_ext := filepath.Ext(fileName)
+		if Include(strings.Split(Exts, &#34;,&#34;), _ext) {
+			wg.Add(1)
+			inCh := make(chan File)
+			go func() {
+				defer wg.Done()
+				select {
+				case &lt;-rCrash:
+					return // exit
+				case f := &lt;-inCh:
+					e, preData := ReadExcel(f.FilePath, f.FileName, pb)
+					if e != nil {
+						tools.Red(&#34;%v&#34;, e)
+						once.Do(func() {
+							close(rCrash)
+						})
+						return
+					}
+					data.Store(f.FileName, preData)
+				}
+			}()
+			go func() {
+				inCh &lt;- File{
+					FileName: fileName,
+					FilePath: dir + string(os.PathSeparator) + fileName,
+				}
+			}()
+		}
+	}
+
+	go func() {
+		wg.Wait()
+		close(rDone)
+	}()
+}
+</code></pre><p>Send file info into <code>inCh</code>. <code>ReadExcel()</code> checks and parses. On error, close <code>rCrash</code>. If it is fine, store it in <code>sync.Map</code>.</p>
+<p>Excel is read with <a href="https://github.com/xuri/excelize/v2">github.com/xuri/excelize/v2</a>:</p>
+<h3 id="read_excel">read_excel()</h3>
+<pre tabindex="0"><code>func ReadExcel(filePath, fileName string, pb *mpb.Progress) (err error, pre *ExcelPre) {
+	f, err := excelize.OpenFile(filePath)
+	if err != nil {
+		return err, nil
+	}
+
+	defer func() {
+		if _e := f.Close(); _e != nil {
+			fmt.Printf(&#34;%s: %v.\n\n&#34;, filePath, _e)
+		}
+	}()
+
+	// Get the first sheet.
+	firstSheet := f.WorkBook.Sheets.Sheet[0].Name
+	rows, err := f.GetRows(firstSheet)
+	lRows := len(rows)
+
+	if lRows &lt; 2 {
+		lRows = 2
+	}
+
+	rb := ReadBar(lRows, filePath, pb)
+	wb := WriteBar(lRows-2, filePath, rb, pb)
+
+	// The first line is the field name.
+	var fields []string
+
+	// The data of the file.
+	var data [][]string
+
+	InCr := func(start time.Time) {
+		rb.Increment()
+		rb.DecoratorEwmaUpdate(time.Since(start))
+	}
+
+	for i := 0; i &lt; lRows; i++ {
+		InCr(time.Now())
+		if i == 0 {
+			fields = rows[i]
+			for index, field := range fields {
+				if isChinese := regexp.MustCompile(&#34;[\u4e00-\u9fa5]&#34;); isChinese.MatchString(field) || field == &#34;&#34; {
+					err = errors.New(fmt.Sprintf(&#34;%s: line 【A%d】 field 【%s】 \n&#34;, filePath, index, field) + &#34;The first line of the file is not a valid attribute name.&#34;)
+					return err, nil
+				}
+
+				// other rules
+			}
+			continue
+		}
+
+		if i == 1 {
+			continue
+		}
+
+		data = append(data, rows[i])
+	}
+
+	return nil, &amp;ExcelPre{
+		FileName:    fileName,
+		Data:        data,
+		Fields:      fields,
+		Prefixes:    Prefix(fileName),
+		ProgressBar: wb,
+	}
+}
+</code></pre><p>This also drives the CLI progress bar, plus a few rules. If there are many rules, make an interface and compose them.</p>
+<p>The rest is normal DB work. I skip that code.</p>
+<p>A run screenshot is lost.</p>
+<p><em>Update, Jan 2022: the job got more custom. We moved it to a web app.</em></p>
+<p><a href="/blog/?q=excel">#excel</a></p>
+<pre><code>                [#go](/blog/?q=go)
+            
+                [#notes](/blog/?q=notes)
+</code></pre>
+
+</content>
+
+<p>
+  
+  <a href="https://note.pp.ua/tags/notes/">#Notes</a>
+  
+</p>
+
+  </main>
+  <footer>
+</footer>
+
+  
+</body>
+
+</html>

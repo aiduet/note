@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Notes on (｡･ω･｡)ﾉ♡ Tu</title>
+    <link>https://note.pp.ua/tags/notes/</link>
+    <description>Recent content in Notes on (｡･ω･｡)ﾉ♡ Tu</description>
+    <generator>Hugo</generator>
+    <language>en</language>
+    <lastBuildDate>Wed, 18 Mar 2026 00:00:00 +0000</lastBuildDate>
+    <atom:link href="https://note.pp.ua/tags/notes/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Refactoring a messy Tieba bot</title>
+      <link>https://note.pp.ua/refactoring-a-messy-tieba-bot-into-an-evolvable-architecture/</link>
+      <pubDate>Wed, 18 Mar 2026 00:00:00 +0000</pubDate>
+      <guid>https://note.pp.ua/refactoring-a-messy-tieba-bot-into-an-evolvable-architecture/</guid>
+      <description>&lt;p&gt;This bot did not get hard because of one big bug.&lt;/p&gt;&#xA;&lt;p&gt;It got hard from many small, reasonable choices.&lt;/p&gt;&#xA;&lt;p&gt;At first the runtime was a simple loop: fetch new threads and replies, filter, judge, maybe like, maybe reply, then save. That lasted longer than it should. Trouble started when new needs blurred what the loop was doing.&lt;/p&gt;&#xA;&lt;p&gt;The question was no longer “does it run?” It was “can we still say why it did, or did not, do something?”&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>Waiting for a domain drop</title>
+      <link>https://note.pp.ua/waiting-for-a-domain-drop/</link>
+      <pubDate>Sat, 04 Jan 2025 00:00:00 +0000</pubDate>
+      <guid>https://note.pp.ua/waiting-for-a-domain-drop/</guid>
+      <description>&lt;p&gt;I am not a domain trader. I just keep a few names, like digital souvenirs.&lt;/p&gt;&#xA;&lt;p&gt;Good names get grabbed in the redemption window. If the old owner does not pay a high fee, the grabber keeps them. Even average names often get registered first, then go to auction or Dan.com. That is annoying.&lt;/p&gt;&#xA;&lt;p&gt;So: a nice name almost never drops for you.&lt;/p&gt;&#xA;&lt;p&gt;The ones worth trying are odd country TLDs, like p.ng or v.ps. I saw an &lt;code&gt;.ee&lt;/code&gt; name on expireddomains.net about to drop. I do not know the exact time, so I wrote a watcher.&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>Preventing AWS traffic runaway</title>
+      <link>https://note.pp.ua/preventing-aws-traffic-runaway/</link>
+      <pubDate>Sat, 23 Mar 2024 00:00:00 +0000</pubDate>
+      <guid>https://note.pp.ua/preventing-aws-traffic-runaway/</guid>
+      <description>&lt;p&gt;I use a free AWS box as a reverse proxy. To keep the traffic quota, I wrote a small script. If usage goes over a limit, it pings a Telegram bot.&lt;/p&gt;&#xA;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;### config.json&#xA;# {&#xA;#   &amp;#34;telegram_bot_token&amp;#34;: &amp;#34;xxxxx:xxxxxxx&amp;#34;,&#xA;#   &amp;#34;chat_id&amp;#34;: &amp;#34;xxxx&amp;#34;,&#xA;#   &amp;#34;monthly_limit_gb&amp;#34;: 100&#xA;# }&#xA;&#xA;import json&#xA;import requests&#xA;import schedule&#xA;import time&#xA;import psutil&#xA;from datetime import datetime&#xA;&#xA;def load_config():&#xA;    with open(&amp;#34;config.json&amp;#34;, &amp;#34;r&amp;#34;) as file:&#xA;        return json.load(file)&#xA;&#xA;def log_initial_traffic_usage():&#xA;    today = datetime.now()&#xA;    if today.day == 1:  # Check if it is the first day of the month&#xA;        net_io = psutil.net_io_counters(pernic=True).get(&amp;#39;ens5&amp;#39;)&#xA;        if net_io:&#xA;            total_bytes_initial = net_io.bytes_sent + net_io.bytes_recv&#xA;            print(f&amp;#39;{total_bytes_initial}&amp;#39;)&#xA;            with open(&amp;#34;traffic_usage.txt&amp;#34;, &amp;#34;w&amp;#34;) as file:&#xA;                file.write(f&amp;#34;{total_bytes_initial}\n&amp;#34;)&#xA;&#xA;def get_current_month_usage():&#xA;    try:&#xA;        with open(&amp;#34;traffic_usage.txt&amp;#34;, &amp;#34;r&amp;#34;) as file:&#xA;            initial_bytes = int(file.readline().strip())&#xA;            net_io = psutil.net_io_counters(pernic=True).get(&amp;#39;ens5&amp;#39;)&#xA;            if net_io:&#xA;                current_total_bytes = net_io.bytes_sent + net_io.bytes_recv&#xA;                used_bytes = current_total_bytes - initial_bytes&#xA;                used_gb = used_bytes / (1024**3)  # Convert to GB&#xA;                return used_gb&#xA;    except FileNotFoundError:&#xA;        print(&amp;#34;Initial traffic usage file not found. Make sure it&amp;#39;s generated at the beginning of the month.&amp;#34;)&#xA;        return None&#xA;&#xA;def send_telegram_message(message, config):&#xA;    url = f&amp;#34;https://api.telegram.org/bot{config[&amp;#39;telegram_bot_token&amp;#39;]}/sendMessage&amp;#34;&#xA;    data = {&#xA;        &amp;#34;chat_id&amp;#34;: config[&amp;#34;chat_id&amp;#34;],&#xA;        &amp;#34;text&amp;#34;: message&#xA;    }&#xA;    requests.post(url, data=data)&#xA;&#xA;def check_traffic_and_notify(config):&#xA;    used_gb = get_current_month_usage()&#xA;    print(f&amp;#39;Already used: {used_gb} GB&amp;#39;)&#xA;    if used_gb is not None and used_gb &amp;gt; config[&amp;#34;monthly_limit_gb&amp;#34;]:&#xA;        send_telegram_message(f&amp;#34;Attention: Monthly traffic limit exceeded. Used: {used_gb:.2f} GB&amp;#34;, config)&#xA;&#xA;config = load_config()&#xA;&#xA;schedule.every().day.at(&amp;#34;00:01&amp;#34;).do(log_initial_traffic_usage)&#xA;schedule.every(15).seconds.do(check_traffic_and_notify, config)&#xA;&#xA;while True:&#xA;    schedule.run_pending()&#xA;    time.sleep(1)&#xA;&lt;/code&gt;&lt;/pre&gt;&lt;pre&gt;&lt;code&gt;                [#aws](/blog/?q=aws)&#xA;            &#xA;                [#cloudflare](/blog/?q=cloudflare)&#xA;            &#xA;                [#notes](/blog/?q=notes)&#xA;&lt;/code&gt;&lt;/pre&gt;</description>
+    </item>
+    <item>
+      <title>Optimizing Cloudflare IP</title>
+      <link>https://note.pp.ua/optimizing-cloudflare-ip/</link>
+      <pubDate>Thu, 22 Feb 2024 00:00:00 +0000</pubDate>
+      <guid>https://note.pp.ua/optimizing-cloudflare-ip/</guid>
+      <description>&lt;p&gt;Sites behind Cloudflare often load slowly in China. I first planned to CNAME through Cloudflare SaaS to a faster domain.&lt;/p&gt;&#xA;&lt;p&gt;Then I saw a NodeSeek user with an API that picks a better Cloudflare IP. I used that API plus the official Cloudflare API, and set the DNS A record myself.&lt;/p&gt;&#xA;&lt;p&gt;Too many people use the CNAME trick. It breaks often.&lt;/p&gt;&#xA;&lt;p&gt;I skip the SaaS setup. Plenty of guides exist. The DNS part is enough.&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>A small frontend tweak for the blog</title>
+      <link>https://note.pp.ua/a-small-frontend-tweak-for-the-blog/</link>
+      <pubDate>Thu, 11 Jan 2024 00:00:00 +0000</pubDate>
+      <guid>https://note.pp.ua/a-small-frontend-tweak-for-the-blog/</guid>
+      <description>&lt;p&gt;I switched the blog theme to &lt;a href=&#34;https://github.com/innei/Shiro&#34;&gt;Shiro&lt;/a&gt;. On the phone it said “Browser version is too low”.&lt;/p&gt;&#xA;&lt;p&gt;The phone was on a current OS and browser.&lt;/p&gt;&#xA;&lt;p&gt;I checked the theme code and the User-Agent:&lt;/p&gt;&#xA;&lt;p&gt;Mozilla/5.0 (iPhone; CPU iPhone OS 17_4 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/123.0.6312.52 Mobile/15E148 Safari/604.1&lt;/p&gt;&#xA;&lt;p&gt;That is Chrome on iOS. It reports as &lt;code&gt;CriOS&lt;/code&gt;.&lt;/p&gt;&#xA;&lt;p&gt;See: &lt;a href=&#34;https://chromium.googlesource.com/chromium/src.git/+/HEAD/docs/ios/user_agent.md&#34;&gt;https://chromium.googlesource.com/chromium/src.git/+/HEAD/docs/ios/user_agent.md&lt;/a&gt;&lt;/p&gt;&#xA;&lt;p&gt;Safari also showed the pop-up. iOS Safari and macOS Safari UAs differ a bit. This check fixed it:&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>A new way to deploy the blog</title>
+      <link>https://note.pp.ua/a-new-way-to-deploy-blog/</link>
+      <pubDate>Sun, 12 Feb 2023 00:00:00 +0000</pubDate>
+      <guid>https://note.pp.ua/a-new-way-to-deploy-blog/</guid>
+      <description>&lt;p&gt;I moved my code repo in some free time.&lt;/p&gt;&#xA;&lt;p&gt;I used to keep private code on Coding, for three reasons:&lt;/p&gt;&#xA;&lt;ol&gt;&#xA;&lt;li&gt;I knew it from work.&lt;/li&gt;&#xA;&lt;li&gt;Push and pull in China was fast.&lt;/li&gt;&#xA;&lt;li&gt;I had private image repos and a few hundred free minutes for deploy.&lt;/li&gt;&#xA;&lt;/ol&gt;&#xA;&lt;p&gt;Then it became paid, and deploy to servers abroad was slow. I tried my own nodes. They were still slow, likely because those servers were weak.&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>A small Go tool to import Excel</title>
+      <link>https://note.pp.ua/golang-excel-importer/</link>
+      <pubDate>Wed, 12 May 2021 00:00:00 +0000</pubDate>
+      <guid>https://note.pp.ua/golang-excel-importer/</guid>
+      <description>&lt;p&gt;Need: import Excel files into MongoDB and MySQL in batches.&lt;/p&gt;&#xA;&lt;p&gt;Work was in Go, so I wrote this in Go too. Colleagues can change it.&lt;/p&gt;&#xA;&lt;p&gt;I called it &lt;code&gt;ecc&lt;/code&gt;. Layout:&lt;/p&gt;&#xA;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;.&#xA;|-- cmd&#xA;|   `-- ecc.go&#xA;|-- configs&#xA;|   |-- cfg.go&#xA;|   `-- cfg.yaml&#xA;|-- data&#xA;|-- internal&#xA;|   `-- importing&#xA;|-- pkg&#xA;|   |-- files&#xA;|   |-- mongo&#xA;|   `-- mysql&#xA;|-- tools&#xA;|    `-- print.go&#xA;|-- go.mod&#xA;|-- go.sum&#xA;|-- LICENSE&#xA;|-- README.en.md&#xA;`-- README.md&#xA;&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&#34;eccgo&#34;&gt;ecc.go&lt;/h3&gt;&#xA;&lt;p&gt;The CLI uses &lt;a href=&#34;https://github.com/urfave/cli/v2&#34;&gt;github.com/urfave/cli/v2&lt;/a&gt;.&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>

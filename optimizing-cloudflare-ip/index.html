@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta http-equiv="X-Clacks-Overhead" content="GNU Terry Pratchett" />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Optimizing Cloudflare IP | (｡･ω･｡)ﾉ♡ Tu</title>
+<meta name="title" content="Optimizing Cloudflare IP" />
+<meta name="description" content="Sites behind Cloudflare often load slowly in China. I first planned to CNAME through Cloudflare SaaS to a faster domain.
+Then I saw a NodeSeek user with an API that picks a better Cloudflare IP. I used that API plus the official Cloudflare API, and set the DNS A record myself.
+Too many people use the CNAME trick. It breaks often.
+I skip the SaaS setup. Plenty of guides exist. The DNS part is enough." />
+<meta name="keywords" content="notes," />
+
+
+<meta property="og:url" content="https://note.pp.ua/optimizing-cloudflare-ip/">
+  <meta property="og:site_name" content="(｡･ω･｡)ﾉ♡ Tu">
+  <meta property="og:title" content="Optimizing Cloudflare IP">
+  <meta property="og:description" content="Sites behind Cloudflare often load slowly in China. I first planned to CNAME through Cloudflare SaaS to a faster domain.
+Then I saw a NodeSeek user with an API that picks a better Cloudflare IP. I used that API plus the official Cloudflare API, and set the DNS A record myself.
+Too many people use the CNAME trick. It breaks often.
+I skip the SaaS setup. Plenty of guides exist. The DNS part is enough.">
+  <meta property="og:locale" content="en">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="blog">
+    <meta property="article:published_time" content="2024-02-22T00:00:00+00:00">
+    <meta property="article:modified_time" content="2024-02-22T00:00:00+00:00">
+    <meta property="article:tag" content="Notes">
+
+
+
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Optimizing Cloudflare IP">
+  <meta name="twitter:description" content="Sites behind Cloudflare often load slowly in China. I first planned to CNAME through Cloudflare SaaS to a faster domain.
+Then I saw a NodeSeek user with an API that picks a better Cloudflare IP. I used that API plus the official Cloudflare API, and set the DNS A record myself.
+Too many people use the CNAME trick. It breaks often.
+I skip the SaaS setup. Plenty of guides exist. The DNS part is enough.">
+
+
+
+
+  <meta itemprop="name" content="Optimizing Cloudflare IP">
+  <meta itemprop="description" content="Sites behind Cloudflare often load slowly in China. I first planned to CNAME through Cloudflare SaaS to a faster domain.
+Then I saw a NodeSeek user with an API that picks a better Cloudflare IP. I used that API plus the official Cloudflare API, and set the DNS A record myself.
+Too many people use the CNAME trick. It breaks often.
+I skip the SaaS setup. Plenty of guides exist. The DNS part is enough.">
+  <meta itemprop="datePublished" content="2024-02-22T00:00:00+00:00">
+  <meta itemprop="dateModified" content="2024-02-22T00:00:00+00:00">
+  <meta itemprop="wordCount" content="468">
+  <meta itemprop="keywords" content="Notes">
+<meta name="referrer" content="no-referrer-when-downgrade" />
+
+  <style>
+  :root {
+    --width: 720px;
+    --font-main: Verdana, sans-serif;
+    --font-secondary: Verdana, sans-serif;
+    --font-scale: 1em;
+    --background-color: #fff;
+    --heading-color: #222;
+    --text-color: #444;
+    --link-color: #3273dc;
+    --visited-color: #8b6fcb;
+    --blockquote-color: #222;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --background-color: #01242e;
+      --heading-color: #eee;
+      --text-color: #ddd;
+      --link-color: #8cc2dd;
+      --visited-color: #8b6fcb;
+      --blockquote-color: #ccc;
+    }
+  }
+
+  body {
+    font-family: var(--font-secondary);
+    font-size: var(--font-scale);
+    margin: auto;
+    padding: 20px;
+    max-width: var(--width);
+    text-align: left;
+    background-color: var(--background-color);
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    line-height: 1.5;
+    color: var(--text-color);
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-main);
+    color: var(--heading-color);
+  }
+
+  a {
+    color: var(--link-color);
+    cursor: pointer;
+    text-decoration: none;
+  }
+
+  a:hover {
+    text-decoration: underline;
+  }
+
+  nav a {
+    margin-right: 8px;
+  }
+
+  strong,
+  b {
+    color: var(--heading-color);
+  }
+
+  button {
+    margin: 0;
+    cursor: pointer;
+  }
+
+  time {
+    font-family: monospace;
+    font-style: normal;
+    font-size: 15px;
+  }
+
+  main {
+    line-height: 1.6;
+  }
+
+  table {
+    width: 100%;
+  }
+
+  hr {
+    border: 0;
+    border-top: 1px dashed;
+  }
+
+  img {
+    max-width: 100%;
+  }
+
+  code {
+    font-family: monospace;
+    padding: 2px;
+    border-radius: 3px;
+  }
+
+  blockquote {
+    border-left: 1px solid #999;
+    color: var(--blockquote-color);
+    padding-left: 20px;
+    font-style: italic;
+  }
+
+  footer {
+    padding: 25px 0;
+    text-align: center;
+  }
+
+  .title:hover {
+    text-decoration: none;
+  }
+
+  .title h1 {
+    font-size: 1.5em;
+  }
+
+  .inline {
+    width: auto !important;
+  }
+
+  .highlight,
+  .code {
+    border-radius: 3px;
+    margin-block-start: 1em;
+    margin-block-end: 1em;
+    overflow-x: auto;
+  }
+
+  .highlight pre,
+  .code pre {
+    min-width: 100%;
+    width: max-content;
+  }
+
+   
+  ul.blog-posts {
+    list-style-type: none;
+    padding: unset;
+  }
+
+  ul.blog-posts li {
+    display: flex;
+  }
+
+  ul.blog-posts li span {
+    flex: 0 0 130px;
+  }
+
+  ul.blog-posts li a:visited {
+    color: var(--visited-color);
+  }
+
+</style>
+
+</head>
+
+<body>
+  <header><a href="/" class="title">
+  <h2>(｡･ω･｡)ﾉ♡ Tu</h2>
+</a>
+<nav>
+<a href="/">Home</a>
+
+<a href="/blog/">Blog</a>
+
+<a href="/contact/">contact me</a>
+
+</nav>
+</header>
+  <main>
+
+<h1>Optimizing Cloudflare IP</h1>
+<p>
+  <i>
+    <time datetime='2024-02-22'>
+      22 Feb, 2024
+    </time>
+  </i>
+</p>
+
+<content>
+  <p>Sites behind Cloudflare often load slowly in China. I first planned to CNAME through Cloudflare SaaS to a faster domain.</p>
+<p>Then I saw a NodeSeek user with an API that picks a better Cloudflare IP. I used that API plus the official Cloudflare API, and set the DNS A record myself.</p>
+<p>Too many people use the CNAME trick. It breaks often.</p>
+<p>I skip the SaaS setup. Plenty of guides exist. The DNS part is enough.</p>
+<pre tabindex="0"><code> curl --request GET \
+  --url https://api.cloudflare.com/client/v4/zones/your_zoneid/dns_records \
+  --header &#39;Content-Type: application/json&#39; \
+  --header &#39;X-Auth-Email: your email&#39; \
+  --header &#39;X-Auth-Key: your key&#39;
+
+// config.json
+
+{
+  &#34;url&#34;: &#34;https://vps789.com/vps/sum/cfIpTop20&#34;,
+  &#34;email&#34;: &#34;&#34;,
+  &#34;key&#34;: &#34;&#34;,
+  &#34;zone_id&#34;: &#34;&#34;,
+  &#34;dns_id&#34;: &#34;&#34;,
+  &#34;domain&#34;: &#34;&#34;,
+  &#34;telegram_bot_token&#34;: &#34;&#34;,
+  &#34;chat_id&#34;: &#34;&#34;
+}
+</code></pre><pre tabindex="0"><code>import requests
+import schedule
+import ipaddress
+import time
+import json
+import os
+
+cf_networks = [
+    &#34;173.245.48.0/20&#34;,
+    &#34;103.21.244.0/22&#34;,
+    &#34;103.22.200.0/22&#34;,
+    &#34;103.31.4.0/22&#34;,
+    &#34;141.101.64.0/18&#34;,
+    &#34;108.162.192.0/18&#34;,
+    &#34;190.93.240.0/20&#34;,
+    &#34;188.114.96.0/20&#34;,
+    &#34;197.234.240.0/22&#34;,
+    &#34;198.41.128.0/17&#34;,
+    &#34;162.158.0.0/15&#34;,
+    &#34;104.16.0.0/13&#34;,
+    &#34;104.24.0.0/14&#34;,
+    &#34;172.64.0.0/13&#34;,
+    &#34;131.0.72.0/22&#34;
+]
+
+def load_config():
+    with open(&#34;config.json&#34;, &#34;r&#34;) as file:
+        return json.load(file)
+
+def save_last_ip(ip):
+    with open(&#34;last_ip.txt&#34;, &#34;w&#34;) as file:
+        file.write(ip)
+
+def load_last_ip():
+    if os.path.exists(&#34;last_ip.txt&#34;):
+        with open(&#34;last_ip.txt&#34;, &#34;r&#34;) as file:
+            return file.read()
+    else:
+        return &#34;&#34;
+
+def is_ip_in_cf(ip, networks):
+    ip_address = ipaddress.ip_address(ip)
+    
+    for network in networks:
+        network_obj = ipaddress.ip_network(network, strict=False)
+        if ip_address in network_obj:
+            return True  
+    
+    return False
+
+def send_telegram_message(config, message):
+    if config[&#39;telegram_bot_token&#39;] and config[&#39;chat_id&#39;]:
+        telegram_url = f&#34;https://api.telegram.org/bot{config[&#39;telegram_bot_token&#39;]}/sendMessage&#34;
+        telegram_data = {&#34;chat_id&#34;: config[&#39;chat_id&#39;], &#34;text&#34;: message}
+        try:
+            requests.post(telegram_url, data=telegram_data)
+        except Exception as e:
+            print(f&#34;Failed to send Telegram message: {e}&#34;)
+
+def get_third_party_data(url, retries=3, delay=120):
+    for i in range(retries):
+        try:
+            response = requests.get(url)
+            response.raise_for_status()  
+            return response.json()
+        except Exception as e:
+            print(f&#34;Attempt {i + 1} failed: {e}&#34;)
+            time.sleep(delay)
+    return None
+
+def get_and_validate_data(url, config, retries=3, delay=120):
+    data = get_third_party_data(url, retries, delay)
+    if not data:
+        send_telegram_message(config, &#34;Failed to get data after several retries.&#34;)
+        return None 
+      
+    try:
+        first_ip = data[&#39;data&#39;][&#39;good&#39;][0][&#39;ip&#39;]
+        if not first_ip:
+            raise ValueError(&#34;IP address is empty.&#34;)
+    except (KeyError, IndexError, ValueError) as e:
+        send_telegram_message(config, f&#34;Data format is invalid or changed: {e}&#34;)
+        return None 
+
+    if not is_ip_in_cf(first_ip, cf_networks):
+        ## send_telegram_message(config, f&#34;The IP address {first_ip} is NOT within the cf&#34;)
+        print(f&#34;The IP address {first_ip} is NOT within the cf&#34;)
+        return None
+
+    return first_ip 
+
+def update_a_and_notify():
+    config = load_config()
+    last_ip = load_last_ip()
+
+    first_ip = get_and_validate_data(config[&#39;url&#39;], config)
+    if not first_ip:
+        return  # Terminate when data acquisition fails or is in an incorrect format
+
+    # Skip update if IP address has not changed
+    if first_ip == last_ip:
+        print(&#34;IP address has not changed, skip update,&#34;)
+        return
+  
+    # Update locally stored IP address
+    save_last_ip(first_ip)
+
+    # Cloudflare API settings
+    headers = {
+        &#34;X-Auth-Email&#34;: config[&#39;email&#39;],
+        &#34;X-Auth-Key&#34;: config[&#39;key&#39;],
+        &#34;Content-Type&#34;: &#34;application/json&#34;
+    }
+
+    cloudflare_api_url = f&#34;https://api.cloudflare.com/client/v4/zones/{config[&#39;zone_id&#39;]}/dns_records/{config[&#39;dns_id&#39;]}&#34;
+    payload = {
+        &#34;type&#34;: &#34;A&#34;,
+        &#34;name&#34;: config[&#39;domain&#39;],
+        &#34;content&#34;: first_ip,
+        &#34;ttl&#34;: 120,
+    }
+
+    # Update A record
+    update_response = requests.put(cloudflare_api_url, json=payload, headers=headers)
+    if update_response.status_code == 200:
+        message = f&#34;Successful Domain Renewal {config[&#39;domain&#39;]} A to {first_ip}&#34;
+    else:
+        message = f&#34;Failed to update  A record for domain {config[&#39;domain&#39;]} : {update_response.text}&#34;
+
+    print(message)
+
+# Timed task settings
+schedule.every(1).minutes.do(update_a_and_notify)
+
+while True:
+    schedule.run_pending()
+    time.sleep(1)
+</code></pre><pre><code>                [#cloudflare](/blog/?q=cloudflare)
+            
+                [#network](/blog/?q=network)
+            
+                [#notes](/blog/?q=notes)
+</code></pre>
+
+</content>
+
+<p>
+  
+  <a href="https://note.pp.ua/tags/notes/">#Notes</a>
+  
+</p>
+
+  </main>
+  <footer>
+</footer>
+
+  
+</body>
+
+</html>

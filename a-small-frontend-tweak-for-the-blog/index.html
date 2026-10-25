@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta http-equiv="X-Clacks-Overhead" content="GNU Terry Pratchett" />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>A small frontend tweak for the blog | (｡･ω･｡)ﾉ♡ Tu</title>
+<meta name="title" content="A small frontend tweak for the blog" />
+<meta name="description" content="I switched the blog theme to Shiro. On the phone it said “Browser version is too low”.
+The phone was on a current OS and browser.
+I checked the theme code and the User-Agent:
+Mozilla/5.0 (iPhone; CPU iPhone OS 17_4 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/123.0.6312.52 Mobile/15E148 Safari/604.1
+That is Chrome on iOS. It reports as CriOS.
+See: https://chromium.googlesource.com/chromium/src.git/&#43;/HEAD/docs/ios/user_agent.md
+Safari also showed the pop-up. iOS Safari and macOS Safari UAs differ a bit. This check fixed it:" />
+<meta name="keywords" content="notes," />
+
+
+<meta property="og:url" content="https://note.pp.ua/a-small-frontend-tweak-for-the-blog/">
+  <meta property="og:site_name" content="(｡･ω･｡)ﾉ♡ Tu">
+  <meta property="og:title" content="A small frontend tweak for the blog">
+  <meta property="og:description" content="I switched the blog theme to Shiro. On the phone it said “Browser version is too low”.
+The phone was on a current OS and browser.
+I checked the theme code and the User-Agent:
+Mozilla/5.0 (iPhone; CPU iPhone OS 17_4 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/123.0.6312.52 Mobile/15E148 Safari/604.1
+That is Chrome on iOS. It reports as CriOS.
+See: https://chromium.googlesource.com/chromium/src.git/&#43;/HEAD/docs/ios/user_agent.md
+Safari also showed the pop-up. iOS Safari and macOS Safari UAs differ a bit. This check fixed it:">
+  <meta property="og:locale" content="en">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="blog">
+    <meta property="article:published_time" content="2024-01-11T00:00:00+00:00">
+    <meta property="article:modified_time" content="2024-01-11T00:00:00+00:00">
+    <meta property="article:tag" content="Notes">
+
+
+
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="A small frontend tweak for the blog">
+  <meta name="twitter:description" content="I switched the blog theme to Shiro. On the phone it said “Browser version is too low”.
+The phone was on a current OS and browser.
+I checked the theme code and the User-Agent:
+Mozilla/5.0 (iPhone; CPU iPhone OS 17_4 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/123.0.6312.52 Mobile/15E148 Safari/604.1
+That is Chrome on iOS. It reports as CriOS.
+See: https://chromium.googlesource.com/chromium/src.git/&#43;/HEAD/docs/ios/user_agent.md
+Safari also showed the pop-up. iOS Safari and macOS Safari UAs differ a bit. This check fixed it:">
+
+
+
+
+  <meta itemprop="name" content="A small frontend tweak for the blog">
+  <meta itemprop="description" content="I switched the blog theme to Shiro. On the phone it said “Browser version is too low”.
+The phone was on a current OS and browser.
+I checked the theme code and the User-Agent:
+Mozilla/5.0 (iPhone; CPU iPhone OS 17_4 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/123.0.6312.52 Mobile/15E148 Safari/604.1
+That is Chrome on iOS. It reports as CriOS.
+See: https://chromium.googlesource.com/chromium/src.git/&#43;/HEAD/docs/ios/user_agent.md
+Safari also showed the pop-up. iOS Safari and macOS Safari UAs differ a bit. This check fixed it:">
+  <meta itemprop="datePublished" content="2024-01-11T00:00:00+00:00">
+  <meta itemprop="dateModified" content="2024-01-11T00:00:00+00:00">
+  <meta itemprop="wordCount" content="242">
+  <meta itemprop="keywords" content="Notes">
+<meta name="referrer" content="no-referrer-when-downgrade" />
+
+  <style>
+  :root {
+    --width: 720px;
+    --font-main: Verdana, sans-serif;
+    --font-secondary: Verdana, sans-serif;
+    --font-scale: 1em;
+    --background-color: #fff;
+    --heading-color: #222;
+    --text-color: #444;
+    --link-color: #3273dc;
+    --visited-color: #8b6fcb;
+    --blockquote-color: #222;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --background-color: #01242e;
+      --heading-color: #eee;
+      --text-color: #ddd;
+      --link-color: #8cc2dd;
+      --visited-color: #8b6fcb;
+      --blockquote-color: #ccc;
+    }
+  }
+
+  body {
+    font-family: var(--font-secondary);
+    font-size: var(--font-scale);
+    margin: auto;
+    padding: 20px;
+    max-width: var(--width);
+    text-align: left;
+    background-color: var(--background-color);
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    line-height: 1.5;
+    color: var(--text-color);
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-main);
+    color: var(--heading-color);
+  }
+
+  a {
+    color: var(--link-color);
+    cursor: pointer;
+    text-decoration: none;
+  }
+
+  a:hover {
+    text-decoration: underline;
+  }
+
+  nav a {
+    margin-right: 8px;
+  }
+
+  strong,
+  b {
+    color: var(--heading-color);
+  }
+
+  button {
+    margin: 0;
+    cursor: pointer;
+  }
+
+  time {
+    font-family: monospace;
+    font-style: normal;
+    font-size: 15px;
+  }
+
+  main {
+    line-height: 1.6;
+  }
+
+  table {
+    width: 100%;
+  }
+
+  hr {
+    border: 0;
+    border-top: 1px dashed;
+  }
+
+  img {
+    max-width: 100%;
+  }
+
+  code {
+    font-family: monospace;
+    padding: 2px;
+    border-radius: 3px;
+  }
+
+  blockquote {
+    border-left: 1px solid #999;
+    color: var(--blockquote-color);
+    padding-left: 20px;
+    font-style: italic;
+  }
+
+  footer {
+    padding: 25px 0;
+    text-align: center;
+  }
+
+  .title:hover {
+    text-decoration: none;
+  }
+
+  .title h1 {
+    font-size: 1.5em;
+  }
+
+  .inline {
+    width: auto !important;
+  }
+
+  .highlight,
+  .code {
+    border-radius: 3px;
+    margin-block-start: 1em;
+    margin-block-end: 1em;
+    overflow-x: auto;
+  }
+
+  .highlight pre,
+  .code pre {
+    min-width: 100%;
+    width: max-content;
+  }
+
+   
+  ul.blog-posts {
+    list-style-type: none;
+    padding: unset;
+  }
+
+  ul.blog-posts li {
+    display: flex;
+  }
+
+  ul.blog-posts li span {
+    flex: 0 0 130px;
+  }
+
+  ul.blog-posts li a:visited {
+    color: var(--visited-color);
+  }
+
+</style>
+
+</head>
+
+<body>
+  <header><a href="/" class="title">
+  <h2>(｡･ω･｡)ﾉ♡ Tu</h2>
+</a>
+<nav>
+<a href="/">Home</a>
+
+<a href="/blog/">Blog</a>
+
+<a href="/contact/">contact me</a>
+
+</nav>
+</header>
+  <main>
+
+<h1>A small frontend tweak for the blog</h1>
+<p>
+  <i>
+    <time datetime='2024-01-11'>
+      11 Jan, 2024
+    </time>
+  </i>
+</p>
+
+<content>
+  <p>I switched the blog theme to <a href="https://github.com/innei/Shiro">Shiro</a>. On the phone it said “Browser version is too low”.</p>
+<p>The phone was on a current OS and browser.</p>
+<p>I checked the theme code and the User-Agent:</p>
+<p>Mozilla/5.0 (iPhone; CPU iPhone OS 17_4 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/123.0.6312.52 Mobile/15E148 Safari/604.1</p>
+<p>That is Chrome on iOS. It reports as <code>CriOS</code>.</p>
+<p>See: <a href="https://chromium.googlesource.com/chromium/src.git/+/HEAD/docs/ios/user_agent.md">https://chromium.googlesource.com/chromium/src.git/+/HEAD/docs/ios/user_agent.md</a></p>
+<p>Safari also showed the pop-up. iOS Safari and macOS Safari UAs differ a bit. This check fixed it:</p>
+<pre tabindex="0"><code>function isSupportedBrowser() {
+  const ua = navigator.userAgent;
+  const macSafariRegex = /Version\/(\d+).*Safari/;
+  const iosVersionRegex = /OS (\d+)_/;
+  const chromeRegex = /Chrome\/(\d+)|CriOS\/(\d+)/;
+  const firefoxRegex = /Firefox\/(\d+)/;
+  const edgeRegex = /Edg\/(\d+)/;
+  const operaRegex = /Opera\/(\d+)/;
+  const criosRegex = /CriOS\/(\d+)/;
+
+  // macOS Safari
+  if (ua.includes(&#39;Macintosh&#39;) &amp;&amp; ua.includes(&#39;Safari&#39;) &amp;&amp; !ua.includes(&#39;Chrome&#39;) &amp;&amp; !ua.includes(&#39;Edg&#39;)) {
+    const match = ua.match(macSafariRegex);
+    return match &amp;&amp; parseInt(match[1], 10) &gt;= 16;
+  }
+
+  // iOS Safari
+  if ((ua.includes(&#39;iPhone&#39;) || ua.includes(&#39;iPad&#39;) || ua.includes(&#39;iPod&#39;)) &amp;&amp; ua.includes(&#39;Safari&#39;) &amp;&amp; !ua.includes(&#39;CriOS&#39;) &amp;&amp; !ua.includes(&#39;Edg&#39;)) {
+    const match = ua.match(iosVersionRegex);
+    return match &amp;&amp; parseInt(match[1], 10) &gt;= 16;
+  }
+
+  // Chrome or Chrome on iOS (CriOS)
+  let match = ua.match(chromeRegex);
+  if (match) {
+    const version = parseInt(match[1] || match[2], 10);
+    return version &gt;= 110;
+  }
+
+  // Edge
+  match = ua.match(edgeRegex);
+  if (match) {
+    return parseInt(match[1], 10) &gt;= 110;
+  }
+
+  // Firefox
+  match = ua.match(firefoxRegex);
+  if (match) {
+    return parseInt(match[1], 10) &gt;= 113;
+  }
+
+  // Opera
+  match = ua.match(operaRegex);
+  if (match) {
+    return parseInt(match[1], 10) &gt;= 102;
+  }
+  
+  return false;
+}
+</code></pre><pre><code>                [#blog](/blog/?q=blog)
+            
+                [#css](/blog/?q=css)
+            
+                [#notes](/blog/?q=notes)
+</code></pre>
+
+</content>
+
+<p>
+  
+  <a href="https://note.pp.ua/tags/notes/">#Notes</a>
+  
+</p>
+
+  </main>
+  <footer>
+</footer>
+
+  
+</body>
+
+</html>
